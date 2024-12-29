@@ -1,5 +1,6 @@
 // Dependencies
 const express = require("express");
+const expressLayouts = require("express-ejs-layouts");
 const path = require("path");
 require("dotenv").config();
 
@@ -11,8 +12,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // View engine
 app.use(express.static(path.join(__dirname, "src/public")));
+app.use(expressLayouts);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "src/views"));
+app.set("layout", "layout");
 
 // Routes
 const indexRouter = require("./src/routes/index");

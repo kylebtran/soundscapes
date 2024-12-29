@@ -1,0 +1,46 @@
+<nav class="w-full">
+  <!-- Vertical responsiveness entirely dependent on height clamp -->
+  <div class="mx-auto max-w-7xl h-[clamp(56px,8vh,84px)] relative">
+    <div class="grid grid-cols-4 h-full items-center font-mono">
+      <div class="flex justify-start">
+        <a href="/" class="p-4 <%= currentPath === '/' ? 'font-medium' : '' %>"
+          >HOME</a
+        >
+      </div>
+      <div class="flex justify-start">
+        <a
+          href="/about"
+          class="p-4 <%= currentPath === '/about' ? 'font-medium' : '' %>"
+          >ABOUT</a
+        >
+      </div>
+      <div class="flex justify-end">
+        <a
+          href="/contact"
+          class="p-4 <%= currentPath === '/contact' ? 'font-medium' : '' %>"
+          >CONTACT</a
+        >
+      </div>
+      <div class="flex justify-end">
+        <a
+          href="/search"
+          class="p-4 <%= currentPath === '/search' ? 'font-medium' : '' %>"
+          >SEARCH</a
+        >
+      </div>
+    </div>
+
+    <!-- Logo -->
+    <div
+      class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-full flex items-center"
+    >
+      <a href="/" class="h-1/2">
+        <img
+          src="/img/supplyframe-remake-logo.svg"
+          alt="Logo"
+          class="h-full object-contain"
+        />
+      </a>
+    </div>
+  </div>
+</nav>
