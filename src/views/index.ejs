@@ -1,12 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>index.ejs</title>
-    <link rel="stylesheet" href="/css/styles.css" />
-  </head>
-  <body>
-    Hello World
-  </body>
-</html>
+<!-- Background -->
+<div class="background-wrapper" id="parallax-bg"></div>
+
+<!-- Hero Section -->
+<section
+  class="hero-section min-h-[max(30vh,240px)] md:min-h-[calc(100vh-clamp(56px,8vh,84px))] flex relative"
+>
+  <div class="absolute-center container-fluid hero-content text-center">
+    <h1 class="text-fluid-h1 font-serif">SOUNDSCAPES</h1>
+    <h2 class="text-fluid-h2 text-primary">STUDIO</h2>
+  </div>
+  <button class="absolute-center-x bottom-10 btn-primary hidden md:block">
+    EXPLORE
+  </button>
+</section>
+
+<!-- Synopsis Section -->
+<section class="features-section py-20 min-h-screen bg-background">
+  <div class="container-fluid">
+    <h2 class="text-fluid-h2 feature-title leading-none">
+      <!-- "Everybody deserves to know how it's done" -->
+      Everybody deserves better recommendations
+    </h2>
+    <div class="grid md:grid-cols-[45%_55%] gap-10 md:mt-8">
+      <div class="feature-card">
+        <div class="w-full h-full bg-primary rounded md:mt-20"></div>
+      </div>
+      <div class="feature-card">
+        <p class="text-[24px] md:text-[32px] font-light leading-snug">
+          Soundscapes is an audio playback service that brings ideas to life
+          through holistic search recommendations. We push the boundaries by
+          solving complex problems, shipping performant solutions that exceed
+          expectations and engage audiences.
+        </p>
+        <button class="btn-primary mt-10">
+          <div class="w-[6px] h-[6px] bg-background rounded-full"></div>
+          <span>ABOUT US</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

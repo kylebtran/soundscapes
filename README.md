@@ -25,6 +25,12 @@ cd soundscapes
 npm install
 ```
 
+3. Build CSS:
+
+```bash
+npm run build:css
+```
+
 ## Dependencies
 
 - **EJS**: JavaScript templating
