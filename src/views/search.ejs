@@ -1,0 +1,25 @@
+<!-- Titles -->
+<div
+  class="grid grid-cols-4 relative items-center text-base font-light container-fluid no-padding mt-16"
+>
+  <div class="flex col-span-2 items-center px-4">TRACK / TITLE</div>
+  <div class="flex px-4">
+    <div class="-translate-x-10">ARTIST</div>
+  </div>
+  <div class="flex justify-between px-4">
+    <div class="-translate-x-[99px]">ALBUM</div>
+    <div>CACHE</div>
+  </div>
+</div>
+<div id="results" class="mt-1"></div>
+
+<!-- Searchbar -->
+<input
+  type="text"
+  id="searchInput"
+  class="container-fluid p-4 fixed bottom-8 left-1/2 -translate-x-1/2 search-input text-xl border border-[#D5D5D5] bg-[#E9E9E9] rounded-full placeholder-[#6B7280]"
+  placeholder="Search by track, artist, or album..."
+  autocomplete="off"
+/>
+
+<script src="/js/search.js" defer></script>

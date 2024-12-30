@@ -2,7 +2,7 @@
 module.exports = {
   content: ["./src/views/**/*.ejs"],
 
-  safelist: ["text-primary", "bg-background", "text-text"],
+  safelist: ["text-primary", "bg-background", "text-text", "text-muted"],
   theme: {
     extend: {
       fontFamily: {
@@ -14,6 +14,7 @@ module.exports = {
         primary: "#BC9618", // Gold
         // secondary: "",
         text: "#15161D", // Eigengrau
+        muted: "#6B7280", // Blue Gray
         background: "#F1F1F1", // Soft White
       },
       fontSize: {

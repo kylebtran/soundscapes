@@ -19,8 +19,10 @@ app.set("layout", "layout");
 
 // Routes
 const indexRouter = require("./src/routes/index");
+const searchRouter = require("./src/routes/search");
 
 app.use("/", indexRouter);
+app.use("/search", searchRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
