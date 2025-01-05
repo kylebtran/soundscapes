@@ -51,27 +51,27 @@ class Search {
     this.resultsContainer.innerHTML = results
       .map(
         (item) => `
-            <div class="container-fluid no-padding flex flex-col items-center font-light">
-                <div class="flex w-[calc(100%-30px)] h-[1px] bg-muted"></div>
-                <div class="w-full grid grid-cols-4 relative items-center text-xl h-[58px]">
+            <a href="/track/${item.id}" class="container-fluid no-padding flex flex-col items-center font-light">
+            <div class="flex w-[calc(100%-30px)] h-[1px] bg-muted"></div>
+            <div class="w-full grid grid-cols-4 relative items-center text-xl h-[58px]">
                 <div class="flex col-span-2 items-center px-4 space-x-8">
-                    <img
+                <img
                     src="${item.album.cover_small}"
                     alt="${item.title}"
                     class="w-8 h-8"
-                    />
-                    <div class="line-clamp-1 truncate">${item.title}</div>
+                />
+                <div class="line-clamp-1 truncate">${item.title}</div>
                 </div>
                 <div class="flex px-4">
-                    <div class="-translate-x-10 line-clamp-1 truncate">${item.artist.name}</div>
+                <div class="-translate-x-10 line-clamp-1 truncate">${item.artist.name}</div>
                 </div>
                 <div class="flex justify-between items-center px-4">
-                    <div class="-translate-x-[99px] line-clamp-1 truncate">${item.album.title}</div>
-                    <div class="font-mono text-base text-primary">NEW</div>
-                </div>
+                <div class="-translate-x-[99px] line-clamp-1 truncate">${item.album.title}</div>
+                <div class="font-mono text-base text-primary">NEW</div>
                 </div>
             </div>
-        `
+            </a>
+            `
       )
       .join("");
   }

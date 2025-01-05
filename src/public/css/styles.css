@@ -79,7 +79,7 @@
   height: max(40vh, 320px);
   z-index: -10;
   will-change: transform;
-  background-image: url("/img/test-window.png");
+  background-image: url("/img/window.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

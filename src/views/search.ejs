@@ -14,12 +14,45 @@
 <div id="results" class="mt-1"></div>
 
 <!-- Searchbar -->
-<input
-  type="text"
-  id="searchInput"
-  class="container-fluid p-4 fixed bottom-8 left-1/2 -translate-x-1/2 search-input text-xl border border-[#D5D5D5] bg-[#E9E9E9] rounded-full placeholder-[#6B7280]"
-  placeholder="Search by track, artist, or album..."
-  autocomplete="off"
-/>
+<div
+  class="container-fluid fixed bottom-0 left-1/2 -translate-x-1/2 bg-background rounded-t-full pb-8"
+>
+  <input
+    type="text"
+    id="searchInput"
+    class="w-full p-4 search-input text-xl border border-[#D5D5D5] bg-[#E9E9E9] rounded-full placeholder-[#6B7280]"
+    placeholder="Search by track, artist, or album..."
+    autocomplete="off"
+  />
+  <div></div>
+</div>
+
+<!-- <a
+  href="/track/${item.id}"
+  class="container-fluid no-padding flex flex-col items-center font-light"
+>
+  <div class="flex w-[calc(100%-30px)] h-[1px] bg-muted"></div>
+  <div class="w-full grid grid-cols-4 relative items-center text-xl h-[58px]">
+    <div class="flex col-span-2 items-center px-4 space-x-8">
+      <img
+        src="${item.album.cover_small}"
+        alt="${item.title}"
+        class="w-8 h-8"
+      />
+      <div class="line-clamp-1 truncate">${item.title}</div>
+    </div>
+    <div class="flex px-4">
+      <div class="-translate-x-10 line-clamp-1 truncate">
+        ${item.artist.name}
+      </div>
+    </div>
+    <div class="flex justify-between items-center px-4">
+      <div class="-translate-x-[99px] line-clamp-1 truncate">
+        ${item.album.title}
+      </div>
+      <div class="font-mono text-base text-primary">NEW</div>
+    </div>
+  </div>
+</a> -->
 
 <script src="/js/search.js" defer></script>
