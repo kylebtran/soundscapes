@@ -9,7 +9,7 @@ function getDefaultTracks() {
       id: "1987726237",
       title: "Reelin' In The Years",
       preview:
-        "https://cdnt-preview.dzcdn.net/api/1/1/5/9/d/0/59df7fce89018023b106320df82755da.mp3?hdnea=exp=1734934882~acl=/api/1/1/5/9/d/0/59df7fce89018023b106320df82755da.mp3*~data=user_id=0,application_id=42~hmac=c370bdfedfcaa42e94c65e15fd4c9418aed560d8990670c8459fa69359425e2d",
+        "https://cdnt-preview.dzcdn.net/api/1/1/5/9/d/0/59df7fce89018023b106320df82755da.mp3?hdnea=exp=1734949252~acl=/api/1/1/5/9/d/0/59df7fce89018023b106320df82755da.mp3*~data=user_id=0,application_id=42~hmac=c16c56555d46ddbcdf8806100cbcd3c7478756ba298f4ca8627c4f42f45788d3",
       artist: { name: "Steely Dan" },
       album: {
         cover_small:
@@ -21,7 +21,7 @@ function getDefaultTracks() {
       id: "626123",
       title: "We Didn't Start the Fire",
       preview:
-        "https://cdnt-preview.dzcdn.net/api/1/1/3/c/2/0/3c217db98586cfe1f9e923b0bde7db96.mp3?hdnea=exp=1734934488~acl=/api/1/1/3/c/2/0/3c217db98586cfe1f9e923b0bde7db96.mp3*~data=user_id=0,application_id=42~hmac=859bd2d44439a3eaab8e51a312f472880770b38884ba62a074e813b915ca46e5",
+        "https://cdnt-preview.dzcdn.net/api/1/1/3/c/2/0/3c217db98586cfe1f9e923b0bde7db96.mp3?hdnea=exp=1734949693~acl=/api/1/1/3/c/2/0/3c217db98586cfe1f9e923b0bde7db96.mp3*~data=user_id=0,application_id=42~hmac=b73e815444d3d4bf5b25d808126371a34091ac780f9d7ac492415b61d627c259",
       artist: { name: "Billy Joel" },
       album: {
         cover_small:
@@ -45,7 +45,7 @@ function getDefaultTracks() {
       id: "136341550",
       title: "My Generation",
       preview:
-        "https://cdnt-preview.dzcdn.net/api/1/1/7/e/3/0/7e32ae92364ce07e54542402efe32b32.mp3?hdnea=exp=1734935129~acl=/api/1/1/7/e/3/0/7e32ae92364ce07e54542402efe32b32.mp3*~data=user_id=0,application_id=42~hmac=70d56367c56127ccc2c3599250e9ce37b5638e1a34ab0d23f1df7e531977b889",
+        "https://cdnt-preview.dzcdn.net/api/1/1/7/e/3/0/7e32ae92364ce07e54542402efe32b32.mp3?hdnea=exp=1734949647~acl=/api/1/1/7/e/3/0/7e32ae92364ce07e54542402efe32b32.mp3*~data=user_id=0,application_id=42~hmac=df85b4b5918c4f3239c26bcc833b016ae407f4dd8920874f1f5beb9d01f89660",
       artist: { name: "The Who" },
       album: {
         cover_small:

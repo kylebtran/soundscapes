@@ -7,13 +7,37 @@ class Search {
     this.searchTimeout = null;
     this.currentAudio = null;
     this.cache = this.loadCache();
+    this.lastCleanup = Date.now();
+    this.nextId = this.determineNextId();
 
     this.setupEventListeners();
+    this.cleanupExpiredCache();
+  }
+
+  determineNextId() {
+    let maxCacheId = 0;
+    Object.values(this.cache).forEach((cacheEntry) => {
+      cacheEntry.results.forEach((item) => {
+        if (item.cacheId && item.cacheId > maxCacheId) {
+          maxCacheId = item.cacheId;
+        }
+      });
+    });
+    return maxCacheId + 1;
   }
 
   setupEventListeners() {
     this.searchInput.addEventListener("input", () => {
       this.debounce(() => this.performSearch(), 300);
+    });
+
+    this.resultsContainer.addEventListener("click", (event) => {
+      const button = event.target.closest(".play-button");
+      if (button) {
+        event.preventDefault();
+        const audioSrc = button.getAttribute("data-preview");
+        this.playAudio(audioSrc);
+      }
     });
   }
 
@@ -124,24 +148,20 @@ class Search {
             `
       )
       .join("");
-
-    this.resultsContainer.addEventListener("click", (event) => {
-      const button = event.target.closest(".play-button");
-      if (button) {
-        event.preventDefault();
-        const audioSrc = button.getAttribute("data-preview");
-        this.playAudio(audioSrc);
-      }
-    });
   }
 
   playAudio(audioSrc) {
-    if (this.currentAudio) {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
+    try {
+      if (this.currentAudio) {
+        this.currentAudio.pause();
+        this.currentAudio.currentTime = 0;
+      }
+      console.log(audioSrc);
+      this.currentAudio = new Audio(audioSrc);
+      this.currentAudio.play();
+    } catch (error) {
+      console.log("Playback error:", error);
     }
-    this.currentAudio = new Audio(audioSrc);
-    this.currentAudio.play();
   }
 }
 
