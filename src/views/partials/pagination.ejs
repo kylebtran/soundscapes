@@ -1,0 +1,56 @@
+<div id="pagination" class="mt-4">
+  <div class="container-fluid">
+    <div class="flex w-full gap-5 justify-end">
+      <button
+          class="pagination-btn <%= meta.page === 1 ? 'disabled' : '' %>"
+          data-action="first"
+          <%= meta.page === 1 ? 'disabled' : '' %>
+        >q</button>
+        <button
+          class="pagination-btn <%= meta.page === 1 ? 'disabled' : '' %>"
+          data-action="prev"
+          <%= meta.page === 1 ? 'disabled' : '' %>
+        >w</button>
+        
+        <% const startPage = Math.max(1, meta.page - 1) %>
+        <% const endPage = Math.min(meta.totalPages, meta.page + 1) %>
+        
+        <% if (startPage > 1) { %>
+          <button class="pagination-btn" data-action="page" data-page="1">1</button>
+          <% if (startPage > 2) { %>
+            <span class="pagination-ellipsis">...</span>
+          <% } %>
+        <% } %>
+        
+        <% for (let i = startPage; i <= endPage; i++) { %>
+          <button
+            class="pagination-btn <%= i === meta.page ? 'active' : '' %>"
+            data-action="page"
+            data-page="<%= i %>"
+          ><%= i %></button>
+        <% } %>
+        
+        <% if (endPage < meta.totalPages) { %>
+          <% if (endPage < meta.totalPages - 1) { %>
+            <span class="pagination-ellipsis">...</span>
+          <% } %>
+          <button class="pagination-btn" 
+                  data-action="page" 
+                  data-page="<%= meta.totalPages %>">
+            <%= meta.totalPages %>
+          </button>
+        <% } %>
+        
+        <button
+          class="pagination-btn <%= meta.page === meta.totalPages ? 'disabled' : '' %>"
+          data-action="next"
+          <%= meta.page === meta.totalPages ? 'disabled' : '' %>
+        >o</button>
+        <button
+          class="pagination-btn <%= meta.page === meta.totalPages ? 'disabled' : '' %>"
+          data-action="last"
+          <%= meta.page === meta.totalPages ? 'disabled' : '' %>
+        >p</button>
+    </div>
+  </div>
+</div>

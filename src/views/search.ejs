@@ -13,39 +13,13 @@
 </div>
 
 <!-- Results -->
-<div id="results" class="mt-1">
-  <% results.forEach((item) => { %>
-  <a
-    href="/track/<%= item.id %>"
-    class="container-fluid no-padding flex flex-col items-center font-light"
-  >
-    <div class="flex w-[calc(100%-30px)] h-[1px] bg-muted"></div>
-    <div class="w-full grid grid-cols-4 relative items-center text-xl h-[58px]">
-      <div class="flex col-span-2 items-center px-4 space-x-8">
-        <button class="play-button" data-preview="<%= item.preview %>">
-          <img
-            src="<%= item.album.cover_small %>"
-            alt="<%= item.title %>"
-            class="w-8 h-8"
-          />
-        </button>
-        <div class="line-clamp-1 truncate"><%= item.title %></div>
-      </div>
-      <div class="flex px-4">
-        <div class="-translate-x-10 line-clamp-1 truncate">
-          <%= item.artist.name %>
-        </div>
-      </div>
-      <div class="flex justify-between items-center px-4">
-        <div class="-translate-x-[99px] line-clamp-1 truncate">
-          <%= item.album.title %>
-        </div>
-        <div class="font-mono text-base text-muted">DEMO</div>
-      </div>
-    </div>
-  </a>
-  <% }); %>
-</div>
+<%- include('partials/results', { results, demo }) %>
+
+<!-- Pagination -->
+<%- include('partials/pagination', { meta }) %>
+
+<!-- Spacer -->
+<div class="min-h-40"></div>
 
 <!-- Searchbar -->
 <div
@@ -53,12 +27,15 @@
 >
   <input
     type="text"
-    id="searchInput"
-    class="w-full p-4 search-input text-xl border border-[#D5D5D5] bg-[#E9E9E9] rounded-full placeholder-[#6B7280]"
+    id="search"
+    class="w-full p-4 search-input text-xl border bg-[#E2E2E2] rounded-full placeholder-[#6B7280]"
+    value="<%= searchQuery %>"
     placeholder="Search by track, artist, or album..."
     autocomplete="off"
   />
-  <div></div>
 </div>
 
+<script>
+  window.initialMeta = <%- JSON.stringify(meta) %>;
+</script>
 <script src="/js/search.js" defer></script>
