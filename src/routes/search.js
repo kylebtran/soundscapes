@@ -6,6 +6,18 @@ function getDefaultTracks() {
   // Deliberately handpicked demo songs from Deezer to provide varied results.
   return [
     {
+      id: "2967020181",
+      title: "Mindgame",
+      preview:
+        "https://cdnt-preview.dzcdn.net/api/1/1/f/8/0/0/f809afe7d16ca2420efe8735b2868fb9.mp3?hdnea=exp=1734957735~acl=/api/1/1/f/8/0/0/f809afe7d16ca2420efe8735b2868fb9.mp3*~data=user_id=0,application_id=42~hmac=a272f07a8476f5f8b696525c906b8a7815bf4c0dd887bdbd135de050cadf4251",
+      artist: { name: "Flawed Mangoes" },
+      album: {
+        cover_small:
+          "https://cdn-images.dzcdn.net/images/cover/3b8bbbe9abc00107cd9d7d21959f3c3a/56x56-000000-80-0-0.jpg",
+        title: "The Unwavering Hand",
+      },
+    },
+    {
       id: "1987726237",
       title: "Reelin' In The Years",
       preview:
@@ -51,6 +63,18 @@ function getDefaultTracks() {
         cover_small:
           "https://cdn-images.dzcdn.net/images/cover/23c805dcd2a98dd04131fcb5d89c1480/56x56-000000-80-0-0.jpg",
         title: "My Generation (50th Anniversary / Super Deluxe)",
+      },
+    },
+    {
+      id: "3137127971",
+      title: "Space II",
+      preview:
+        "https://cdnt-preview.dzcdn.net/api/1/1/5/2/1/0/5216af4469470f4f7d54e7ed358b9a5a.mp3?hdnea=exp=1734955927~acl=/api/1/1/5/2/1/0/5216af4469470f4f7d54e7ed358b9a5a.mp3*~data=user_id=0,application_id=42~hmac=6b47419f03898715da8d1ce23c3a2c6ecc7e513bf9957515730e62780b5ff690",
+      artist: { name: "Dorian Concept" },
+      album: {
+        cover_small:
+          "https://cdn-images.dzcdn.net/images/cover/a9aa8ecea3b048548be9a37c44b43a84/56x56-000000-80-0-0.jpg",
+        title: "Space II",
       },
     },
   ];
