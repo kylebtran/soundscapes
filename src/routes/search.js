@@ -80,35 +80,85 @@ function getDefaultTracks() {
   ];
 }
 
-router.get("/", (req, res) => {
-  const defaultTracks = getDefaultTracks();
-  res.render("search", {
-    title: "Search",
-    results: defaultTracks,
-  });
+router.get("/", async (req, res) => {
+  const { q, page = 1, limit = 25 } = req.query;
+
+  if (!q) {
+    const defaultTracks = getDefaultTracks();
+    return res.render("search", {
+      title: "Search",
+      results: defaultTracks,
+      meta: {
+        page: 1,
+        totalPages: 1,
+        total: defaultTracks.length,
+      },
+      searchQuery: "",
+      demo: true,
+    });
+  }
+
+  try {
+    const response = await axios.get(`https://api.deezer.com/search`, {
+      params: {
+        q,
+        limit,
+        index: (page - 1) * limit,
+      },
+    });
+
+    const meta = {
+      total: response.data.total,
+      page: Number(page),
+      totalPages: Math.ceil(response.data.total / limit),
+    };
+
+    res.render("search", {
+      title: "Search",
+      results: response.data.data,
+      meta,
+      searchQuery: q,
+      demo: false,
+    });
+  } catch (error) {
+    console.error("Deezer API Error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch results from Deezer.",
+    });
+  }
 });
 
 router.get("/api/search", async (req, res) => {
-  const { q = "", limit = 25 } = req.query;
+  const { q = "", limit = 25, page = 1 } = req.query;
 
-  //   try {
-  const response = await axios.get(`https://api.deezer.com/search`, {
-    params: {
-      q: q,
-      limit: limit,
-    },
-  });
-  res.json({
-    success: true,
-    results: response.data.data,
-  });
-  //   } catch (error) {
-  //     console.error("Deezer API Error:", error);
-  //     res.status(500).json({
-  //       success: false,
-  //       error: "Failed to fetch results from Deezer",
-  //     });
-  //   }
+  try {
+    const response = await axios.get(`https://api.deezer.com/search`, {
+      params: {
+        q: q,
+        limit: limit,
+        index: (page - 1) * limit,
+      },
+    });
+
+    const meta = {
+      total: response.data.total,
+      page: Number(page),
+      totalPages: Math.ceil(response.data.total / limit),
+    };
+
+    res.json({
+      success: true,
+      results: response.data.data,
+      meta: meta,
+    });
+  } catch (error) {
+    console.error("Deezer API Error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch results from Deezer.",
+    });
+  }
 });
 
 module.exports = router;

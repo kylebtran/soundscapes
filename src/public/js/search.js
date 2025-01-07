@@ -1,21 +1,32 @@
-const CACHE_SIZE = 250;
-const CACHE_LIFETIME = 1000 * 60 * 60; // 1 hour
+const CACHE = {
+  SIZE: 250,
+  LIFETIME: 1000 * 60 * 60, // 1 hour
+};
 
 class Search {
   constructor() {
-    this.searchInput = document.getElementById("searchInput");
+    this.searchContainer = document.getElementById("search");
     this.resultsContainer = document.getElementById("results");
+    this.paginationContainer = document.getElementById("pagination");
+
     this.searchTimeout = null;
     this.currentAudio = null;
-    this.cache = this.loadCache();
+    this.cache = this.getCache();
     this.lastCleanup = Date.now();
-    this.nextId = this.determineNextId();
+    this.nextId = this.getNextId();
 
-    this.setupEventListeners();
+    this.setEventListeners();
     this.cleanupExpiredCache();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQuery = urlParams.get("q");
+    if (initialQuery) {
+      const page = parseInt(urlParams.get("page")) || 1;
+      this.displayPagination(window.initialMeta || { page, totalPages: 1 });
+    }
   }
 
-  determineNextId() {
+  getNextId() {
     let maxCacheId = 0;
     Object.values(this.cache).forEach((cacheEntry) => {
       cacheEntry.results.forEach((item) => {
@@ -27,11 +38,13 @@ class Search {
     return maxCacheId + 1;
   }
 
-  setupEventListeners() {
-    this.searchInput.addEventListener("input", () => {
-      this.debounce(() => this.performSearch(), 300);
+  setEventListeners() {
+    // Search listener
+    this.searchContainer.addEventListener("input", () => {
+      this.debounce(() => this.search(), 300);
     });
 
+    // Audio preview listener
     this.resultsContainer.addEventListener("click", (event) => {
       const button = event.target.closest(".play-button");
       if (button) {
@@ -40,14 +53,11 @@ class Search {
         this.playAudio(audioSrc);
       }
     });
+
+    // Pagination listener
   }
 
-  debounce(func, wait) {
-    clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(func, wait);
-  }
-
-  loadCache() {
+  getCache() {
     try {
       const cached = localStorage.getItem("searchCache");
       return cached ? JSON.parse(cached) : {};
@@ -57,15 +67,32 @@ class Search {
     }
   }
 
-  saveCache() {
+  setStatus(item) {
+    const existingId = this.findExistingCacheId(item.id);
+
+    if (existingId) {
+      return {
+        status: String(existingId).padStart(3, "0"),
+        color: "text-muted",
+      };
+    } else {
+      item.cacheId = this.nextId++;
+      return {
+        status: "NEW",
+        color: "text-primary",
+      };
+    }
+  }
+
+  setCache() {
     try {
       const cacheEntries = Object.entries(this.cache);
-      if (cacheEntries.length > CACHE_SIZE) {
+      if (cacheEntries.length > CACHE.SIZE) {
         // Sorts by timestamp to keep most recent entries
         const sortedEntries = cacheEntries.sort(
           (a, b) => b[1].timestamp - a[1].timestamp
         );
-        this.cache = Object.fromEntries(sortedEntries.slice(0, CACHE_SIZE));
+        this.cache = Object.fromEntries(sortedEntries.slice(0, CACHE.SIZE));
       }
       localStorage.setItem("searchCache", JSON.stringify(this.cache));
     } catch (error) {
@@ -73,28 +100,28 @@ class Search {
     }
   }
 
-  isCacheExpired(timestamp) {
-    return Date.now() - timestamp > CACHE_LIFETIME;
+  getIsCacheExpired(timestamp) {
+    return Date.now() - timestamp > CACHE.LIFETIME;
   }
 
   cleanupExpiredCache() {
     const now = Date.now();
-    if (now - this.lastCleanup < CACHE_LIFETIME) {
+    if (now - this.lastCleanup < CACHE.LIFETIME) {
       return;
     }
 
     const validEntries = Object.entries(this.cache).filter(
-      ([_, data]) => !this.isCacheExpired(data.timestamp)
+      ([_, data]) => !this.getIsCacheExpired(data.timestamp)
     );
     this.cache = Object.fromEntries(validEntries);
-    this.saveCache();
+    this.setCache();
     this.lastCleanup = now;
   }
 
   findInCache(query) {
-    query = query.toLowerCase();
+    // query = query.toLowerCase();
     const { results, timestamp } = this.cache[query] || {};
-    if (results && !this.isCacheExpired(timestamp)) {
+    if (results && !this.getIsCacheExpired(timestamp)) {
       return results;
     }
     return null;
@@ -114,15 +141,20 @@ class Search {
 
   getRecentResults() {
     const recentEntries = Object.entries(this.cache)
-      .filter(([_, data]) => !this.isCacheExpired(data.timestamp))
+      .filter(([_, data]) => !this.getIsCacheExpired(data.timestamp))
       .sort((a, b) => b[1].timestamp - a[1].timestamp);
 
     if (recentEntries.length === 0) return [];
     return recentEntries[0][1].results;
   }
 
-  async performSearch() {
-    const query = this.searchInput.value.trim().toLowerCase();
+  debounce(func, wait) {
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(func, wait);
+  }
+
+  async search(page = 1) {
+    const query = this.searchContainer.value.trim().toLowerCase();
 
     if (!query) {
       const recentResults = this.getRecentResults();
@@ -142,40 +174,28 @@ class Search {
 
     try {
       const response = await fetch(
-        `/search/api/search?q=${encodeURIComponent(query)}`
+        `/search/api/search?q=${encodeURIComponent(query)}&page=${page}`
       );
       const data = await response.json();
 
-      if (!data.success) {
-        throw new Error(data.error);
+      // Commented out to avoid saving cache while page # isn't being cached
+      // this.cache[query] = {
+      //   results: data.results,
+      //   timestamp: Date.now(),
+      // };
+      // this.saveCache();
+
+      if (data.success) {
+        await this.displayResults(data.results);
+        this.displayPagination(data.meta);
       }
-
-      this.cache[query] = {
-        results: data.results,
-        timestamp: Date.now(),
-      };
-      this.saveCache();
-
-      this.displayResults(data.results);
     } catch (error) {
       console.error("Search error:", error);
-    }
-  }
-
-  assignItemStatus(item) {
-    const existingId = this.findExistingCacheId(item.id);
-
-    if (existingId) {
-      return {
-        status: String(existingId).padStart(3, "0"),
-        color: "text-muted",
-      };
-    } else {
-      item.cacheId = this.nextId++;
-      return {
-        status: "NEW",
-        color: "text-primary",
-      };
+    } finally {
+      const url = new URL(window.location);
+      url.searchParams.set("q", query);
+      url.searchParams.set("page", page);
+      window.history.pushState({}, "", url);
     }
   }
 
@@ -191,7 +211,6 @@ class Search {
         const img = new Image();
         img.src = item.album.cover_small;
         img.onload = () => resolve();
-        img.onerror = () => resolve();
       });
     });
 
@@ -199,7 +218,7 @@ class Search {
 
     this.resultsContainer.innerHTML = results
       .map((item) => {
-        const status = this.assignItemStatus(item);
+        const status = this.setStatus(item);
         return `
           <a href="/track/${item.id}" 
              class="container-fluid no-padding flex flex-col items-center font-light">
@@ -233,6 +252,89 @@ class Search {
         `;
       })
       .join("");
+  }
+
+  displayPagination(meta) {
+    const { page, totalPages } = meta;
+    const startPage = Math.max(1, page - 1);
+    const endPage = Math.min(totalPages, page + 1);
+
+    this.paginationContainer.innerHTML = `
+    <div class="container-fluid">
+      <div class="flex w-full gap-5 justify-end">
+        <button
+          class="pagination-btn ${page === 1 ? "disabled" : ""}"
+          data-action="first"
+          ${page === 1 ? "disabled" : ""}
+        >q</button>
+        <button
+          class="pagination-btn ${page === 1 ? "disabled" : ""}"
+          data-action="prev"
+          ${page === 1 ? "disabled" : ""}
+        >w</button>
+        ${
+          startPage > 1
+            ? `
+          <button class="pagination-btn" data-action="page" data-page="1">1</button>
+          ${startPage > 2 ? '<span class="pagination-ellipsis">...</span>' : ""}
+          `
+            : ""
+        }
+        ${Array.from(
+          { length: endPage - startPage + 1 },
+          (_, i) => startPage + i
+        )
+          .map(
+            (i) => `
+            <button
+              class="pagination-btn ${i === page ? "active" : ""}"
+              data-action="page"
+              data-page="${i}"
+            >${i}</button>
+          `
+          )
+          .join("")}
+        ${
+          endPage < totalPages
+            ? `
+          ${
+            endPage < totalPages - 1
+              ? '<span class="pagination-ellipsis">...</span>'
+              : ""
+          }
+          <button class="pagination-btn" data-action="page" data-page="${totalPages}">${totalPages}</button>
+          `
+            : ""
+        }
+        <button
+          class="pagination-btn ${page === totalPages ? "disabled" : ""}"
+          data-action="next"
+          ${page === totalPages ? "disabled" : ""}
+        >o</button>
+        <button
+          class="pagination-btn ${page === totalPages ? "disabled" : ""}"
+          data-action="last"
+          ${page === totalPages ? "disabled" : ""}
+        >p</button>
+      </div>
+    </div>
+    `;
+
+    this.paginationContainer.querySelectorAll("button").forEach((button) => {
+      const action = button.getAttribute("data-action");
+      const targetPage = parseInt(button.getAttribute("data-page"), 10);
+      if (action === "first") {
+        button.addEventListener("click", () => this.search(1));
+      } else if (action === "prev") {
+        button.addEventListener("click", () => this.search(page - 1));
+      } else if (action === "next") {
+        button.addEventListener("click", () => this.search(page + 1));
+      } else if (action === "last") {
+        button.addEventListener("click", () => this.search(totalPages));
+      } else if (action === "page") {
+        button.addEventListener("click", () => this.search(targetPage));
+      }
+    });
   }
 
   playAudio(audioSrc) {
