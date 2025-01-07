@@ -15,6 +15,9 @@ class Search {
     this.lastCleanup = Date.now();
     this.nextId = this.getNextId();
 
+    this.searchContainer.addEventListener("input", () => {
+      this.debounce(() => this.search(), 300);
+    });
     this.setEventListeners();
     this.cleanupExpiredCache();
 
@@ -22,7 +25,7 @@ class Search {
     const initialQuery = urlParams.get("q");
     if (initialQuery) {
       const page = parseInt(urlParams.get("page")) || 1;
-      this.displayPagination(window.initialMeta || { page, totalPages: 1 });
+      this.search(page);
     }
   }
 
@@ -39,9 +42,43 @@ class Search {
   }
 
   setEventListeners() {
-    // Search listener
-    this.searchContainer.addEventListener("input", () => {
-      this.debounce(() => this.search(), 300);
+    // Pagination listener
+    const paginationClone = this.paginationContainer.cloneNode(true);
+    this.paginationContainer.parentNode.replaceChild(
+      paginationClone,
+      this.paginationContainer
+    );
+    this.paginationContainer = paginationClone;
+
+    this.paginationContainer.addEventListener("click", (event) => {
+      const button = event.target.closest(".pagination-btn");
+      if (!button || button.disabled) return;
+
+      const action = button.getAttribute("data-action");
+      const targetPage = parseInt(button.getAttribute("data-page"), 10);
+      const currentPage =
+        parseInt(new URLSearchParams(window.location.search).get("page")) || 1;
+      const totalPages = window.initialMeta.totalPages;
+
+      let newPage;
+      if (action === "first") {
+        newPage = 1;
+      } else if (action === "prev") {
+        newPage = Math.max(1, currentPage - 1);
+      } else if (action === "next") {
+        newPage = Math.min(totalPages, currentPage + 1);
+      } else if (action === "last") {
+        newPage = totalPages;
+      } else if (action === "page") {
+        newPage = targetPage;
+      } else {
+        return;
+      }
+
+      if (newPage !== currentPage) {
+        event.preventDefault();
+        this.search(newPage);
+      }
     });
 
     // Audio preview listener
@@ -53,8 +90,6 @@ class Search {
         this.playAudio(audioSrc);
       }
     });
-
-    // Pagination listener
   }
 
   getCache() {
@@ -157,184 +192,75 @@ class Search {
     const query = this.searchContainer.value.trim().toLowerCase();
 
     if (!query) {
-      const recentResults = this.getRecentResults();
-      if (recentResults.length) {
-        this.displayResults(recentResults);
-      } else {
-        this.resultsContainer.innerHTML = "";
-      }
+      await this.render("", 1);
       return;
     }
 
-    const cachedResults = this.findInCache(query);
-    if (cachedResults) {
-      this.displayResults(cachedResults);
-      return;
-    }
+    await this.render(query, page);
+  }
 
+  async render(query, page) {
     try {
       const response = await fetch(
-        `/search/api/search?q=${encodeURIComponent(query)}&page=${page}`
+        `/search?q=${encodeURIComponent(query)}&page=${page}`,
+        {
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        }
       );
       const data = await response.json();
 
-      // Commented out to avoid saving cache while page # isn't being cached
-      // this.cache[query] = {
-      //   results: data.results,
-      //   timestamp: Date.now(),
-      // };
-      // this.saveCache();
-
       if (data.success) {
-        await this.displayResults(data.results);
-        this.displayPagination(data.meta);
+        window.initialMeta = data.data.meta;
+
+        const imagePromises = data.data.results.map(
+          ({ album }) =>
+            new Promise((resolve) => {
+              if (!album?.cover_small) return resolve();
+
+              const img = new Image();
+              img.onload = img.onerror = () => resolve();
+              img.src = album.cover_small;
+            })
+        );
+
+        await Promise.all(imagePromises);
+
+        const tempContainer = document.createElement("div");
+        tempContainer.innerHTML = data.html.results;
+        const newResults = tempContainer.firstElementChild;
+
+        const tempPagination = document.createElement("div");
+        tempPagination.innerHTML = data.html.pagination;
+        const newPagination = tempPagination.firstElementChild;
+
+        if (newResults && newPagination) {
+          this.resultsContainer.replaceWith(newResults);
+          this.paginationContainer.replaceWith(newPagination);
+
+          this.resultsContainer = document.getElementById("results");
+          this.paginationContainer = document.getElementById("pagination");
+        }
+
+        if (query) {
+          this.cache[query] = {
+            results: data.data.results,
+            timestamp: Date.now(),
+          };
+          this.setCache();
+        }
+
+        const url = new URL(window.location);
+        url.searchParams.set("q", query);
+        url.searchParams.set("page", page);
+        window.history.pushState({}, "", url);
+
+        this.setEventListeners();
       }
     } catch (error) {
       console.error("Search error:", error);
-    } finally {
-      const url = new URL(window.location);
-      url.searchParams.set("q", query);
-      url.searchParams.set("page", page);
-      window.history.pushState({}, "", url);
     }
-  }
-
-  async displayResults(results) {
-    if (!results.length) {
-      this.resultsContainer.innerHTML =
-        '<div class="absolute-center text-xl font-light">No results found</div>';
-      return;
-    }
-
-    const preloadImages = results.map((item) => {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.src = item.album.cover_small;
-        img.onload = () => resolve();
-      });
-    });
-
-    await Promise.all(preloadImages);
-
-    this.resultsContainer.innerHTML = results
-      .map((item) => {
-        const status = this.setStatus(item);
-        return `
-          <a href="/track/${item.id}" 
-             class="container-fluid no-padding flex flex-col items-center font-light">
-            <div class="flex w-[calc(100%-30px)] h-[1px] bg-muted"></div>
-            <div class="w-full grid grid-cols-4 relative items-center text-xl h-[58px]">
-              <div class="flex col-span-2 items-center px-4 space-x-8">
-                <button class="play-button" data-preview="${item.preview}">
-                  <img
-                    src="${item.album.cover_small}"
-                    alt="${item.title}"
-                    class="w-8 h-8"
-                  />
-                </button>
-                <div class="line-clamp-1 truncate">${item.title}</div>
-              </div>
-              <div class="flex px-4">
-                <div class="-translate-x-10 line-clamp-1 truncate">
-                  ${item.artist.name}
-                </div>
-              </div>
-              <div class="flex justify-between items-center px-4">
-                <div class="-translate-x-[99px] line-clamp-1 truncate">
-                  ${item.album.title}
-                </div>
-                <div class="font-mono text-base ${status.color}">
-                  ${status.status}
-                </div>
-              </div>
-            </div>
-          </a>
-        `;
-      })
-      .join("");
-  }
-
-  displayPagination(meta) {
-    const { page, totalPages } = meta;
-    const startPage = Math.max(1, page - 1);
-    const endPage = Math.min(totalPages, page + 1);
-
-    this.paginationContainer.innerHTML = `
-    <div class="container-fluid">
-      <div class="flex w-full gap-5 justify-end">
-        <button
-          class="pagination-btn ${page === 1 ? "disabled" : ""}"
-          data-action="first"
-          ${page === 1 ? "disabled" : ""}
-        >q</button>
-        <button
-          class="pagination-btn ${page === 1 ? "disabled" : ""}"
-          data-action="prev"
-          ${page === 1 ? "disabled" : ""}
-        >w</button>
-        ${
-          startPage > 1
-            ? `
-          <button class="pagination-btn" data-action="page" data-page="1">1</button>
-          ${startPage > 2 ? '<span class="pagination-ellipsis">...</span>' : ""}
-          `
-            : ""
-        }
-        ${Array.from(
-          { length: endPage - startPage + 1 },
-          (_, i) => startPage + i
-        )
-          .map(
-            (i) => `
-            <button
-              class="pagination-btn ${i === page ? "active" : ""}"
-              data-action="page"
-              data-page="${i}"
-            >${i}</button>
-          `
-          )
-          .join("")}
-        ${
-          endPage < totalPages
-            ? `
-          ${
-            endPage < totalPages - 1
-              ? '<span class="pagination-ellipsis">...</span>'
-              : ""
-          }
-          <button class="pagination-btn" data-action="page" data-page="${totalPages}">${totalPages}</button>
-          `
-            : ""
-        }
-        <button
-          class="pagination-btn ${page === totalPages ? "disabled" : ""}"
-          data-action="next"
-          ${page === totalPages ? "disabled" : ""}
-        >o</button>
-        <button
-          class="pagination-btn ${page === totalPages ? "disabled" : ""}"
-          data-action="last"
-          ${page === totalPages ? "disabled" : ""}
-        >p</button>
-      </div>
-    </div>
-    `;
-
-    this.paginationContainer.querySelectorAll("button").forEach((button) => {
-      const action = button.getAttribute("data-action");
-      const targetPage = parseInt(button.getAttribute("data-page"), 10);
-      if (action === "first") {
-        button.addEventListener("click", () => this.search(1));
-      } else if (action === "prev") {
-        button.addEventListener("click", () => this.search(page - 1));
-      } else if (action === "next") {
-        button.addEventListener("click", () => this.search(page + 1));
-      } else if (action === "last") {
-        button.addEventListener("click", () => this.search(totalPages));
-      } else if (action === "page") {
-        button.addEventListener("click", () => this.search(targetPage));
-      }
-    });
   }
 
   playAudio(audioSrc) {

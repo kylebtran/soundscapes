@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
+const ejs = require("ejs");
 
 function getDefaultTracks() {
   // Deliberately handpicked demo songs from Deezer to provide varied results.
@@ -82,83 +83,73 @@ function getDefaultTracks() {
 
 router.get("/", async (req, res) => {
   const { q, page = 1, limit = 25 } = req.query;
+  const isAjax = req.headers["x-requested-with"] === "XMLHttpRequest";
 
-  if (!q) {
-    const defaultTracks = getDefaultTracks();
+  try {
+    const { results, meta } = await fetchSearchResults(q, page, limit);
+
+    if (isAjax) {
+      const [resultsHtml, paginationHtml] = await Promise.all([
+        ejs.renderFile("src/views/partials/results.ejs", {
+          results,
+          demo: !q,
+          getStatus: null,
+        }),
+        ejs.renderFile("src/views/partials/pagination.ejs", { meta }),
+      ]);
+
+      return res.json({
+        success: true,
+        html: { results: resultsHtml, pagination: paginationHtml },
+        data: { results, meta },
+      });
+    }
+
     return res.render("search", {
       title: "Search",
+      results,
+      meta,
+      searchQuery: q,
+      demo: !q,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch and/or render results.",
+    });
+  }
+});
+
+async function fetchSearchResults(q, page, limit) {
+  if (!q) {
+    const defaultTracks = getDefaultTracks();
+    return {
       results: defaultTracks,
       meta: {
         page: 1,
         totalPages: 1,
         total: defaultTracks.length,
       },
-      searchQuery: "",
-      demo: true,
-    });
+    };
   }
 
-  try {
-    const response = await axios.get(`https://api.deezer.com/search`, {
-      params: {
-        q,
-        limit,
-        index: (page - 1) * limit,
-      },
-    });
+  const response = await axios.get(`https://api.deezer.com/search`, {
+    params: {
+      q,
+      limit,
+      index: (page - 1) * limit,
+    },
+  });
 
-    const meta = {
+  return {
+    results: response.data.data,
+    meta: {
       total: response.data.total,
       page: Number(page),
       totalPages: Math.ceil(response.data.total / limit),
-    };
-
-    res.render("search", {
-      title: "Search",
-      results: response.data.data,
-      meta,
-      searchQuery: q,
-      demo: false,
-    });
-  } catch (error) {
-    console.error("Deezer API Error:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch results from Deezer.",
-    });
-  }
-});
-
-router.get("/api/search", async (req, res) => {
-  const { q = "", limit = 25, page = 1 } = req.query;
-
-  try {
-    const response = await axios.get(`https://api.deezer.com/search`, {
-      params: {
-        q: q,
-        limit: limit,
-        index: (page - 1) * limit,
-      },
-    });
-
-    const meta = {
-      total: response.data.total,
-      page: Number(page),
-      totalPages: Math.ceil(response.data.total / limit),
-    };
-
-    res.json({
-      success: true,
-      results: response.data.data,
-      meta: meta,
-    });
-  } catch (error) {
-    console.error("Deezer API Error:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch results from Deezer.",
-    });
-  }
-});
+    },
+  };
+}
 
 module.exports = router;
