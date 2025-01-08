@@ -193,9 +193,11 @@ class Search {
   async search(page = 1) {
     const query = this.searchContainer.value.trim().toLowerCase();
 
-    const cachedResults = this.findInCache(query, page);
-    if (cachedResults) {
-      try {
+    try {
+      let html, results;
+
+      const cachedResults = this.findInCache(query, page);
+      if (cachedResults) {
         const response = await fetch("/search/render-partials", {
           method: "POST",
           headers: {
@@ -209,100 +211,38 @@ class Search {
         });
 
         const data = await response.json();
+        if (!data.success) return;
 
-        if (data.success) {
-          window.initialMeta = cachedResults.meta;
+        window.initialMeta = cachedResults.meta;
+        html = data.html;
+        results = cachedResults.results;
+      } else {
+        const response = await fetch(
+          `/search?q=${encodeURIComponent(query)}&page=${page}`,
+          {
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+            },
+          }
+        );
+        const data = await response.json();
+        if (!data.success) return;
 
-          this.resultsContainer.innerHTML = data.html.results;
-          this.paginationContainer.innerHTML = data.html.pagination;
-
-          const statusElements = this.resultsContainer.querySelectorAll(
-            "[data-track-status]"
-          );
-          cachedResults.results.forEach((item, index) => {
-            const statusElement = statusElements[index];
-            if (statusElement) {
-              const status = this.setStatus(item);
-              statusElement.textContent = status.status;
-              statusElement.className = `font-mono text-base ${status.color}`;
-            }
-          });
-
-          const url = new URL(window.location);
-          url.searchParams.set("q", query);
-          url.searchParams.set("page", page);
-          window.history.pushState({}, "", url);
-          console.log(
-            "Restored cached results for:",
-            this.getCacheKey(query, page)
-          );
-
-          return;
-        }
-      } catch (error) {
-        console.error("Error rendering cached results:", error);
-      }
-    }
-
-    try {
-      const response = await fetch(
-        `/search?q=${encodeURIComponent(query)}&page=${page}`,
-        {
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-          },
-        }
-      );
-      const data = await response.json();
-
-      if (data.success) {
         window.initialMeta = data.data.meta;
 
         const imagePromises = data.data.results.map(
           ({ album }) =>
             new Promise((resolve) => {
               if (!album?.cover_small) return resolve();
-
               const img = new Image();
               img.onload = img.onerror = () => resolve();
               img.src = album.cover_small;
             })
         );
-
         await Promise.all(imagePromises);
 
-        const tempContainer = document.createElement("div");
-        tempContainer.innerHTML = data.html.results;
-        const newResults = tempContainer.firstElementChild;
-
-        const tempPagination = document.createElement("div");
-        tempPagination.innerHTML = data.html.pagination;
-        const newPagination = tempPagination.firstElementChild;
-
-        const statusElements = tempContainer.querySelectorAll(
-          ".font-mono.text-base"
-        );
-        data.data.results.forEach((item, index) => {
-          const statusElement = statusElements[index];
-          if (statusElement) {
-            if (!query) {
-              statusElement.textContent = "DEMO";
-              statusElement.className = "font-mono text-base text-muted";
-            } else {
-              const status = this.setStatus(item);
-              statusElement.textContent = status.status;
-              statusElement.className = `font-mono text-base ${status.color}`;
-            }
-          }
-        });
-
-        if (newResults && newPagination) {
-          this.resultsContainer.replaceWith(newResults);
-          this.paginationContainer.replaceWith(newPagination);
-
-          this.resultsContainer = document.getElementById("results");
-          this.paginationContainer = document.getElementById("pagination");
-        }
+        html = data.html;
+        results = data.data.results;
 
         if (query) {
           const cacheKey = this.getCacheKey(query, page);
@@ -313,14 +253,47 @@ class Search {
           };
           this.setCache();
         }
-
-        const url = new URL(window.location);
-        url.searchParams.set("q", query);
-        url.searchParams.set("page", page);
-        window.history.pushState({}, "", url);
-
-        this.setEventListeners();
       }
+
+      const tempContainer = document.createElement("div");
+      tempContainer.innerHTML = html.results;
+      const newResults = tempContainer.firstElementChild;
+
+      const tempPagination = document.createElement("div");
+      tempPagination.innerHTML = html.pagination;
+      const newPagination = tempPagination.firstElementChild;
+
+      const statusElements = tempContainer.querySelectorAll(
+        ".font-mono.text-base"
+      );
+      results.forEach((item, index) => {
+        const statusElement = statusElements[index];
+        if (statusElement) {
+          if (!query) {
+            statusElement.textContent = "DEMO";
+            statusElement.className = "font-mono text-base text-muted";
+          } else {
+            const status = this.setStatus(item);
+            statusElement.textContent = status.status;
+            statusElement.className = `font-mono text-base ${status.color}`;
+          }
+        }
+      });
+
+      if (newResults && newPagination) {
+        this.resultsContainer.replaceWith(newResults);
+        this.paginationContainer.replaceWith(newPagination);
+
+        this.resultsContainer = document.getElementById("results");
+        this.paginationContainer = document.getElementById("pagination");
+      }
+
+      const url = new URL(window.location);
+      url.searchParams.set("q", query);
+      url.searchParams.set("page", page);
+      window.history.pushState({}, "", url);
+
+      this.setEventListeners();
     } catch (error) {
       console.error("Search error:", error);
     }
