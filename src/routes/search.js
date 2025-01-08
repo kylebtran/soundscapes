@@ -152,4 +152,33 @@ async function fetchSearchResults(q, page, limit) {
   };
 }
 
+router.post("/render-partials", async (req, res) => {
+  try {
+    const [resultsHtml, paginationHtml] = await Promise.all([
+      ejs.renderFile("src/views/partials/results.ejs", {
+        results: req.body.results,
+        demo: false,
+        getStatus: null,
+      }),
+      ejs.renderFile("src/views/partials/pagination.ejs", {
+        meta: req.body.meta,
+      }),
+    ]);
+
+    res.json({
+      success: true,
+      html: {
+        results: resultsHtml,
+        pagination: paginationHtml,
+      },
+    });
+  } catch (error) {
+    console.error("Template rendering error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to render templates",
+    });
+  }
+});
+
 module.exports = router;

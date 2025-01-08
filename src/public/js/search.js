@@ -22,10 +22,8 @@ class Search {
     this.cleanupExpiredCache();
 
     const urlParams = new URLSearchParams(window.location.search);
-    const initialQuery = urlParams.get("q");
-    if (initialQuery) {
-      const page = parseInt(urlParams.get("page")) || 1;
-      this.search(page);
+    if (urlParams.get("q")) {
+      this.search(parseInt(urlParams.get("page")));
     }
   }
 
@@ -110,13 +108,12 @@ class Search {
         status: String(existingId).padStart(3, "0"),
         color: "text-muted",
       };
-    } else {
-      item.cacheId = this.nextId++;
-      return {
-        status: "NEW",
-        color: "text-primary",
-      };
     }
+    item.cacheId = this.nextId++;
+    return {
+      status: "NEW",
+      color: "text-primary",
+    };
   }
 
   setCache() {
@@ -153,11 +150,15 @@ class Search {
     this.lastCleanup = now;
   }
 
-  findInCache(query) {
-    // query = query.toLowerCase();
-    const { results, timestamp } = this.cache[query] || {};
+  getCacheKey(query, page) {
+    return `${query}:${page}`;
+  }
+
+  findInCache(query, page) {
+    const cacheKey = this.getCacheKey(query, page);
+    const { results, meta, timestamp } = this.cache[cacheKey] || {};
     if (results && !this.getIsCacheExpired(timestamp)) {
-      return results;
+      return { results, meta };
     }
     return null;
   }
@@ -171,6 +172,7 @@ class Search {
         return existingItem.cacheId;
       }
     }
+    console.log("Added new item to cache:", itemId);
     return null;
   }
 
@@ -191,15 +193,57 @@ class Search {
   async search(page = 1) {
     const query = this.searchContainer.value.trim().toLowerCase();
 
-    if (!query) {
-      await this.render("", 1);
-      return;
+    const cachedResults = this.findInCache(query, page);
+    if (cachedResults) {
+      try {
+        const response = await fetch("/search/render-partials", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+          body: JSON.stringify({
+            results: cachedResults.results,
+            meta: cachedResults.meta,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          window.initialMeta = cachedResults.meta;
+
+          this.resultsContainer.innerHTML = data.html.results;
+          this.paginationContainer.innerHTML = data.html.pagination;
+
+          const statusElements = this.resultsContainer.querySelectorAll(
+            "[data-track-status]"
+          );
+          cachedResults.results.forEach((item, index) => {
+            const statusElement = statusElements[index];
+            if (statusElement) {
+              const status = this.setStatus(item);
+              statusElement.textContent = status.status;
+              statusElement.className = `font-mono text-base ${status.color}`;
+            }
+          });
+
+          const url = new URL(window.location);
+          url.searchParams.set("q", query);
+          url.searchParams.set("page", page);
+          window.history.pushState({}, "", url);
+          console.log(
+            "Restored cached results for:",
+            this.getCacheKey(query, page)
+          );
+
+          return;
+        }
+      } catch (error) {
+        console.error("Error rendering cached results:", error);
+      }
     }
 
-    await this.render(query, page);
-  }
-
-  async render(query, page) {
     try {
       const response = await fetch(
         `/search?q=${encodeURIComponent(query)}&page=${page}`,
@@ -235,6 +279,23 @@ class Search {
         tempPagination.innerHTML = data.html.pagination;
         const newPagination = tempPagination.firstElementChild;
 
+        const statusElements = tempContainer.querySelectorAll(
+          ".font-mono.text-base"
+        );
+        data.data.results.forEach((item, index) => {
+          const statusElement = statusElements[index];
+          if (statusElement) {
+            if (!query) {
+              statusElement.textContent = "DEMO";
+              statusElement.className = "font-mono text-base text-muted";
+            } else {
+              const status = this.setStatus(item);
+              statusElement.textContent = status.status;
+              statusElement.className = `font-mono text-base ${status.color}`;
+            }
+          }
+        });
+
         if (newResults && newPagination) {
           this.resultsContainer.replaceWith(newResults);
           this.paginationContainer.replaceWith(newPagination);
@@ -244,8 +305,10 @@ class Search {
         }
 
         if (query) {
-          this.cache[query] = {
+          const cacheKey = this.getCacheKey(query, page);
+          this.cache[cacheKey] = {
             results: data.data.results,
+            meta: data.data.meta,
             timestamp: Date.now(),
           };
           this.setCache();
