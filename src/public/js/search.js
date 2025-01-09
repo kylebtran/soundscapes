@@ -8,16 +8,21 @@ class Search {
     this.searchContainer = document.getElementById("search");
     this.resultsContainer = document.getElementById("results");
     this.paginationContainer = document.getElementById("pagination");
+    this.playContainer = document.getElementById("play");
 
     this.searchTimeout = null;
     this.currentAudio = null;
     this.cache = this.getCache();
     this.lastCleanup = Date.now();
     this.nextId = this.getNextId();
+    this.playlist = [];
+    this.currentTrackIndex = -1;
+    this.isPlaying = false;
 
     this.searchContainer.addEventListener("input", () => {
       this.debounce(() => this.search(), 300);
     });
+    this.playContainer.addEventListener("click", () => this.togglePlaylist());
     this.setEventListeners();
     this.cleanupExpiredCache();
 
@@ -172,7 +177,6 @@ class Search {
         return existingItem.cacheId;
       }
     }
-    console.log("Added new item to cache:", itemId);
     return null;
   }
 
@@ -299,11 +303,76 @@ class Search {
     }
   }
 
+  togglePlaylist() {
+    if (this.isPlaying) {
+      this.stopPlaylist();
+    } else {
+      this.startPlaylist();
+    }
+  }
+
+  startPlaylist() {
+    const playButtons = this.resultsContainer.querySelectorAll(".play-button");
+    this.playlist = Array.from(playButtons).map((button) =>
+      button.getAttribute("data-preview")
+    );
+
+    if (this.playlist.length === 0) return;
+
+    this.isPlaying = true;
+    this.currentTrackIndex = -1;
+    this.playContainer.textContent = "STOP";
+    this.playNextTrack();
+  }
+
+  stopPlaylist() {
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+    }
+    this.isPlaying = false;
+    this.currentTrackIndex = -1;
+    this.playContainer.textContent = "PLAY";
+  }
+
+  playNextTrack() {
+    if (!this.isPlaying) return;
+
+    this.currentTrackIndex++;
+    if (this.currentTrackIndex >= this.playlist.length) {
+      this.stopPlaylist();
+      return;
+    }
+
+    const audioSrc = this.playlist[this.currentTrackIndex];
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+    }
+
+    this.currentAudio = new Audio(audioSrc);
+    this.currentAudio.addEventListener("ended", () => this.playNextTrack());
+    this.currentAudio.play().catch((error) => {
+      console.error("Playback error:", error);
+      this.playNextTrack();
+    });
+  }
+
   playAudio(audioSrc) {
+    if (this.isPlaying) {
+      this.stopPlaylist();
+    }
+
     try {
       if (this.currentAudio) {
         this.currentAudio.pause();
         this.currentAudio.currentTime = 0;
+
+        if (this.currentAudio.src == audioSrc) {
+          this.currentAudio = null;
+
+          return;
+        }
       }
       this.currentAudio = new Audio(audioSrc);
       this.currentAudio.play();

@@ -23,7 +23,7 @@
 
 <!-- Searchbar -->
 <div
-  class="container-fluid fixed bottom-0 left-1/2 -translate-x-1/2 bg-background rounded-t-full pb-8"
+  class="container-fluid fixed bottom-0 left-1/2 -translate-x-1/2 bg-background rounded-t-full pb-8 flex gap-4"
 >
   <input
     type="text"
@@ -33,6 +33,12 @@
     placeholder="Search by track, artist, or album..."
     autocomplete="off"
   />
+  <button
+    id="play"
+    class="bg-text text-background min-w-[192px] font-mono flex justify-center items-center rounded-lg"
+  >
+    PLAY
+  </button>
 </div>
 
 <script>
