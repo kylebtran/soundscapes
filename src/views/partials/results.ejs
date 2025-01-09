@@ -19,17 +19,13 @@
             onerror="this.src='/img/no-img.png'"
           />
         </button>
-        <div class="line-clamp-1 truncate"><%= item.title %></div>
+        <div class="truncate w-[calc(100%-128px)]"><%= item.title %></div>
       </div>
       <div class="flex px-4">
-        <div class="-translate-x-10 line-clamp-1 truncate">
-          <%= item.artist.name %>
-        </div>
+        <div class="-translate-x-10 truncate"><%= item.artist.name %></div>
       </div>
       <div class="flex justify-between items-center px-4">
-        <div class="-translate-x-[99px] line-clamp-1 truncate">
-          <%= item.album.title %>
-        </div>
+        <div class="-translate-x-[99px] truncate"><%= item.album.title %></div>
         <div data-track-status class="font-mono text-base <%= status.color %>">
           <%= status.status %>
         </div>
