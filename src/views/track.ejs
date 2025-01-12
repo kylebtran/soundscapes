@@ -1,1 +1,97 @@
-<div class="container-fluid"><%= item.title %></div>
+<!-- Item -->
+<div class="container-fluid no-padding mt-16 flex justify-between items-end">
+  <div class="flex flex-col px-4 gap-2">
+    <span class="text-fluid-h2 -mt-20 line-clamp-2"><%= item.title %></span
+    ><span class="font-mono font-normal text-muted text-2xl"
+      ><%= item.artist.name.toUpperCase() %></span
+    >
+  </div>
+  <div class="flex px-4">
+    <div class="flex flex-col">
+      <img
+        src="<%= item.album.cover_big %>"
+        alt="<%= item.title %>"
+        class="w-80 h-80"
+        onerror="this.src='/img/no-img.png'"
+      />
+    </div>
+  </div>
+</div>
+
+<!-- Subsections -->
+<div
+  class="container-fluid grid grid-cols-4 gap-8 items-center text-xl font-light mt-16"
+>
+  <div class="flex flex-col h-full">
+    <span class="font-mono text-base">RANK</span>
+    <div class="flex w-full h-[1px] bg-muted"></div>
+    <span class="text-3xl font-semibold mt-2">#<%= item.rank %></span>
+  </div>
+  <div class="flex flex-col h-full">
+    <span class="font-mono text-base">GENRE</span>
+    <div class="flex w-full h-[1px] bg-muted"></div>
+    <span class="mt-2">
+      <% album.genres.data.forEach((genre, index) => { %> <%= genre.name %><%=
+      index < album.genres.data.length - 1 ? ', ' : '' %> <% }); %></span
+    >
+  </div>
+  <div class="flex flex-col h-full">
+    <span class="font-mono text-base">DETAILS</span>
+    <div class="flex w-full h-[1px] bg-muted"></div>
+    <span class="mt-2"> Released: <%= item.release_date %></span>
+    <span class="">
+      Duration: <%=
+      `${Math.floor(item.duration/60)}:${(item.duration%60).toString().padStart(2,'0')}`
+      %></span
+    >
+  </div>
+  <div class="flex h-full items-start">
+    <button
+      id="play"
+      class="bg-text text-background w-full font-mono text-xl h-16 flex justify-center items-center rounded-lg mt-6"
+    >
+      PREVIEW
+    </button>
+  </div>
+</div>
+
+<!-- Album -->
+<div class="mt-16">
+  <span class="container-fluid flex font-mono text-base font-light"
+    ><%= album.record_type.toUpperCase() %></span
+  >
+  <% album.tracks.data.forEach((item, index) => { %>
+  <a
+    href="/track/<%= item.id %>"
+    class="container-fluid no-padding flex flex-col items-center font-light"
+  >
+    <div class="flex w-[calc(100%-30px)] h-[1px] bg-muted"></div>
+    <div class="w-full grid grid-cols-4 relative items-center text-xl h-[58px]">
+      <div class="flex col-span-2 items-center px-4 space-x-8">
+        <div class="font-mono text-base text-muted">
+          <%= (index + 1).toString().padStart(3, '0') %>
+        </div>
+        <div class="truncate w-[calc(100%-128px)]"><%= item.title %></div>
+      </div>
+      <div class="flex px-4">
+        <div class="truncate"><%= item.artist.name %></div>
+      </div>
+      <div class="flex justify-end items-center px-4">
+        <div class="truncate font-mono text-base text-muted">
+          <%=
+          `${Math.floor(item.duration/60)}:${(item.duration%60).toString().padStart(2,'0')}`
+          %>
+        </div>
+      </div>
+    </div>
+  </a>
+  <% }); %>
+</div>
+
+<!-- Spacer -->
+<div class="min-h-40"></div>
+
+<script id="item-data" type="application/json">
+  <%- JSON.stringify({ preview: item.preview }) %>
+</script>
+<script src="/js/track.js" defer></script>

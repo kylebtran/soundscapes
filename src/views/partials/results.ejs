@@ -1,9 +1,8 @@
 <div id="results" class="mt-1">
   <% if (!results.length) { %>
   <div class="absolute-center text-xl font-light">No results found</div>
-  <% } else { %> <% results.forEach(item => { %> <% const status =
-  locals.getStatus ? getStatus(item) : { status: demo ? 'DEMO' : '', color:
-  'text-muted' } %>
+  <% } else { %> <% results.forEach(item => { %> <% const status = { status:
+  demo ? 'DEMO' : '', color: 'text-muted' } %>
   <a
     href="/track/<%= item.id %>"
     class="container-fluid no-padding flex flex-col items-center font-light"
@@ -15,7 +14,7 @@
           <img
             src="<%= item.album.cover_small %>"
             alt="<%= item.title %>"
-            class="w-8 h-8"
+            class="w-8 h-8 transform transition-transform duration-200 ease-in-out hover:scale-125"
             onerror="this.src='/img/no-img.png'"
           />
         </button>

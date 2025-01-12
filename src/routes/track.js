@@ -6,11 +6,17 @@ router.get("/:id", async (req, res) => {
   const itemId = req.params.id;
 
   try {
-    const response = await axios.get(`https://api.deezer.com/track/${itemId}`);
+    const trackResponse = await axios.get(
+      `https://api.deezer.com/track/${itemId}`
+    );
+    const albumResponse = await axios.get(
+      `https://api.deezer.com/album/${trackResponse.data.album.id}`
+    );
 
     return res.render("track", {
-      title: `${response.data.title} - Soundscapes`,
-      item: response.data,
+      title: `${trackResponse.data.title} - Soundscapes`,
+      item: trackResponse.data,
+      album: albumResponse.data,
     });
   } catch (error) {
     console.error("Error:", error);
