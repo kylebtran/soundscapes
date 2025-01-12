@@ -12,7 +12,6 @@
         src="<%= item.album.cover_big %>"
         alt="<%= item.title %>"
         class="w-80 h-80"
-        onerror="this.src='/img/no-img.png'"
       />
     </div>
   </div>
@@ -48,7 +47,7 @@
   <div class="flex h-full items-start">
     <button
       id="play"
-      class="bg-text text-background w-full font-mono text-xl h-16 flex justify-center items-center rounded-lg mt-6"
+      class="bg-text text-background w-full font-mono text-lg h-16 flex justify-center items-center rounded-lg mt-6"
     >
       PREVIEW
     </button>
@@ -58,7 +57,8 @@
 <!-- Album -->
 <div class="mt-16">
   <span class="container-fluid flex font-mono text-base font-light"
-    ><%= album.record_type.toUpperCase() %></span
+    ><%= album.title.toUpperCase() + ` - ` + album.record_type.toUpperCase()
+    %></span
   >
   <% album.tracks.data.forEach((item, index) => { %>
   <a
@@ -89,7 +89,7 @@
 </div>
 
 <!-- Spacer -->
-<div class="min-h-40"></div>
+<div class="min-h-80"></div>
 
 <script id="item-data" type="application/json">
   <%- JSON.stringify({ preview: item.preview }) %>

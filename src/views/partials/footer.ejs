@@ -1,0 +1,46 @@
+<footer
+  class="bg-text text-background pt-24 pb-8 text-xl relative <%= title === 'Search' ? 'hidden' : '' %>"
+>
+  <div class="absolute inset-0 w-full h-full">
+    <img src="/img/stone.png" alt="" class="w-full h-full object-cover" />
+  </div>
+  <div class="relative z-10">
+    <div class="container-fluid grid grid-cols-2 md:grid-cols-4 gap-12">
+      <div class="space-y-4 col-span-2">
+        <h3 class="text-base font-mono uppercase mb-4">SOUNDSCAPES</h3>
+      </div>
+      <div class="space-y-4">
+        <h3 class="text-base font-mono uppercase mb-4">Product</h3>
+        <ul class="space-y-3 font-light">
+          <li><a href="/search" class="hover:underline">Search</a></li>
+          <li>
+            <a
+              href="https://github.com/kylebtran/soundscapes"
+              class="hover:underline"
+              >GitHub</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://github.com/kylebtran/soundscapes/commits/main/"
+              class="hover:underline"
+              >Changelog</a
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="space-y-4">
+        <h3 class="text-base font-mono uppercase mb-4">Company</h3>
+        <ul class="space-y-3 font-light">
+          <li><a href="/about" class="hover:underline">About</a></li>
+          <li><a href="/contact" class="hover:underline">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container-fluid mt-32">
+      <div class="text-base text-muted">
+        © 2025 Soundscapes. All rights reserved.
+      </div>
+    </div>
+  </div>
+</footer>
