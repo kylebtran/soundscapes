@@ -1,25 +1,23 @@
 <!-- Item -->
-<div class="container-fluid no-padding mt-16 flex justify-between items-end">
-  <div class="flex flex-col px-4 gap-2">
+<div class="container-fluid mt-32 md:mt-16 grid md:grid-cols-2 items-end">
+  <div class="flex flex-col gap-2">
     <span class="text-fluid-h2 -mt-20 line-clamp-2"><%= item.title %></span
     ><span class="font-mono font-normal text-muted text-2xl"
       ><%= item.artist.name.toUpperCase() %></span
     >
   </div>
-  <div class="flex px-4">
-    <div class="flex flex-col">
-      <img
-        src="<%= item.album.cover_big %>"
-        alt="<%= item.title %>"
-        class="w-80 h-80"
-      />
-    </div>
+  <div class="flex md:justify-end">
+    <img
+      src="<%= item.album.cover_big %>"
+      alt="<%= item.title %>"
+      class="w-full h-full md:w-80 md:h-80"
+    />
   </div>
 </div>
 
 <!-- Subsections -->
 <div
-  class="container-fluid grid grid-cols-4 gap-8 items-center text-xl font-light mt-16"
+  class="container-fluid grid md:grid-cols-4 gap-8 items-center text-xl font-light mt-16"
 >
   <div class="flex flex-col h-full">
     <span class="font-mono text-base">RANK</span>
@@ -66,17 +64,24 @@
     class="container-fluid no-padding flex flex-col items-center font-light"
   >
     <div class="flex w-[calc(100%-30px)] h-[1px] bg-muted"></div>
-    <div class="w-full grid grid-cols-4 relative items-center text-xl h-[58px]">
+    <div
+      class="w-full grid md:grid-cols-4 relative items-center text-xl h-[58px]"
+    >
       <div class="flex col-span-2 items-center px-4 space-x-8">
         <div class="font-mono text-base text-muted">
           <%= (index + 1).toString().padStart(3, '0') %>
         </div>
         <div class="truncate w-[calc(100%-128px)]"><%= item.title %></div>
+        <div class="md:hidden font-mono text-base text-muted text-end">
+          <%=
+          `${Math.floor(item.duration/60)}:${(item.duration%60).toString().padStart(2,'0')}`
+          %>
+        </div>
       </div>
-      <div class="flex px-4">
+      <div class="md:flex px-4 hidden">
         <div class="truncate"><%= item.artist.name %></div>
       </div>
-      <div class="flex justify-end items-center px-4">
+      <div class="md:flex justify-end items-center px-4 hidden">
         <div class="truncate font-mono text-base text-muted">
           <%=
           `${Math.floor(item.duration/60)}:${(item.duration%60).toString().padStart(2,'0')}`

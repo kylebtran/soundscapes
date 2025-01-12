@@ -5,21 +5,28 @@
       <div class="flex justify-start">
         <a
           href="/"
-          class="p-4 <%= title === 'Soundscapes' ? 'font-normal' : '' %>"
+          class="p-4 <%= title === 'Soundscapes' ? 'font-normal' : '' %> hidden md:block"
           >HOME</a
         >
+        <a href="/" class="h-8 md:hidden ml-4">
+          <img
+            src="/img/supplyframe-remake-logo.svg"
+            alt="Logo"
+            class="h-full object-contain"
+          />
+        </a>
       </div>
       <div class="flex justify-start">
         <a
           href="/about"
-          class="p-4 <%= title === 'About' ? 'font-normal' : '' %>"
+          class="p-4 <%= title === 'About' ? 'font-normal' : '' %> hidden md:block"
           >ABOUT</a
         >
       </div>
       <div class="flex justify-end">
         <a
           href="/contact"
-          class="p-4 <%= title === 'Contact' ? 'font-normal' : '' %>"
+          class="p-4 <%= title === 'Contact' ? 'font-normal' : '' %> hidden md:block"
           >CONTACT</a
         >
       </div>
@@ -33,7 +40,7 @@
     </div>
 
     <!-- Logo -->
-    <div class="absolute-center h-full flex items-center">
+    <div class="absolute-center h-full md:flex items-center hidden">
       <a href="/" class="h-1/2">
         <img
           src="/img/supplyframe-remake-logo.svg"

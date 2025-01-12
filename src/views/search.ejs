@@ -1,12 +1,12 @@
 <!-- Titles -->
 <div
-  class="grid grid-cols-4 relative items-center text-base font-light container-fluid no-padding mt-16"
+  class="grid grid-cols-4 relative items-center text-base font-light container-fluid no-padding mt-4 md:mt-16"
 >
   <div class="flex col-span-2 items-center px-4">TRACK / TITLE</div>
-  <div class="flex px-4">
+  <div class="md:flex px-4 hidden">
     <div class="-translate-x-10">ARTIST</div>
   </div>
-  <div class="flex justify-between px-4">
+  <div class="md:flex justify-between px-4 hidden">
     <div class="-translate-x-[99px]">ALBUM</div>
     <div>CACHE</div>
   </div>
@@ -23,19 +23,19 @@
 
 <!-- Searchbar -->
 <div
-  class="container-fluid fixed bottom-0 left-1/2 -translate-x-1/2 bg-background rounded-t-full pb-8 flex gap-4"
+  class="container-fluid fixed bottom-0 left-1/2 -translate-x-1/2 bg-background rounded-t-full pb-8 flex flex-col md:flex-row gap-4"
 >
   <input
     type="text"
     id="search"
-    class="w-full p-4 search-input text-xl border bg-[#E2E2E2] rounded-full placeholder-[#6B7280]"
+    class="w-full px-4 py-3 md:py-4 search-input md:text-xl border bg-[#E2E2E2] rounded-lg md:rounded-full placeholder-[#6B7280]"
     value="<%= searchQuery %>"
     placeholder="Search by track, artist, or album..."
     autocomplete="off"
   />
   <button
     id="play"
-    class="bg-text text-background min-w-[192px] font-mono flex justify-center items-center rounded-lg"
+    class="bg-text text-background min-w-[192px] font-mono flex justify-center items-center rounded-lg h-12"
   >
     PLAY
   </button>

@@ -8,24 +8,36 @@
     class="container-fluid no-padding flex flex-col items-center font-light"
   >
     <div class="flex w-[calc(100%-30px)] h-[1px] bg-muted"></div>
-    <div class="w-full grid grid-cols-4 relative items-center text-xl h-[58px]">
-      <div class="flex col-span-2 items-center px-4 space-x-8">
+    <div
+      class="w-full grid md:grid-cols-4 relative items-center text-xl h-[58px]"
+    >
+      <div class="flex md:col-span-2 items-center px-4 space-x-8">
         <button class="play-button" data-preview="<%= item.preview %>">
           <img
             src="<%= item.album.cover_small %>"
             alt="<%= item.title %>"
-            class="w-8 h-8 transform transition-transform duration-200 ease-in-out hover:scale-125"
+            class="min-w-8 h-8 transform transition-transform duration-200 ease-in-out hover:scale-125"
             onerror="this.src='/img/no-img.png'"
           />
         </button>
-        <div class="truncate w-[calc(100%-128px)]"><%= item.title %></div>
+        <div class="truncate w-full md:w-[calc(100%-128px)] flex flex-col">
+          <%= item.title %>
+          <span class="text-muted text-base md:hidden block"
+            ><%= item.artist.name %></span
+          >
+        </div>
       </div>
-      <div class="flex px-4">
+      <div class="md:flex px-4 hidden">
         <div class="-translate-x-10 truncate"><%= item.artist.name %></div>
       </div>
       <div class="flex justify-between items-center px-4">
-        <div class="-translate-x-[99px] truncate"><%= item.album.title %></div>
-        <div data-track-status class="font-mono text-base <%= status.color %>">
+        <div class="-translate-x-[99px] truncate hidden md:block">
+          <%= item.album.title %>
+        </div>
+        <div
+          data-track-status
+          class="font-mono text-base hidden md:block <%= status.color %>"
+        >
           <%= status.status %>
         </div>
       </div>
