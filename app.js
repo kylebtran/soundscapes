@@ -22,11 +22,13 @@ const indexRouter = require("./src/routes/index");
 const searchRouter = require("./src/routes/search");
 const trackRouter = require("./src/routes/track");
 const contactRouter = require("./src/routes/contact");
+const aboutRouter = require("./src/routes/about");
 
 app.use("/", indexRouter);
 app.use("/search", searchRouter);
 app.use("/track", trackRouter);
 app.use("/contact", contactRouter);
+app.use("/about", aboutRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
