@@ -37,6 +37,7 @@ npm run build:css
 - **Express**: Web application framework
 - **Express EJS Layouts**: EJS-Express layout support
 - **Tailwind CSS**
+- **GSAP**
 - **axios**
 - **dotenv**
 - **nodemon**
