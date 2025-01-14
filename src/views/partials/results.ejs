@@ -2,7 +2,7 @@
   <% if (!results.length) { %>
   <div class="absolute-center text-xl font-light">No results found</div>
   <% } else { %> <% results.forEach(item => { %> <% const status = { status:
-  demo ? 'DEMO' : '', color: 'text-muted' } %>
+  demo ? 'DEMO' : ''}%>
   <a
     href="/track/<%= item.id %>"
     class="container-fluid no-padding flex flex-col items-center font-light"
@@ -23,8 +23,8 @@
         <div class="truncate w-full md:w-[calc(100%-128px)] flex flex-col">
           <%= item.title %>
           <span class="text-muted text-base md:hidden block"
-            ><%= item.artist.name %></span
-          >
+            ><%= item.artist.name %>
+          </span>
         </div>
       </div>
       <div class="md:flex px-4 hidden">
@@ -36,7 +36,7 @@
         </div>
         <div
           data-track-status
-          class="font-mono text-base hidden md:block <%= status.color %>"
+          class="font-mono text-base hidden md:block text-muted"
         >
           <%= status.status %>
         </div>

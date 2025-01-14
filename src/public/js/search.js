@@ -106,15 +106,12 @@ class Search {
   }
 
   setStatus(item) {
-    const existingId = this.findExistingCacheId(item.id);
-
-    if (existingId) {
+    if (item.cacheId && !item.isNew) {
       return {
-        status: String(existingId).padStart(3, "0"),
+        status: String(item.cacheId).padStart(3, "0"),
         color: "text-muted",
       };
     }
-    item.cacheId = this.nextId++;
     return {
       status: "NEW",
       color: "text-primary",
@@ -163,7 +160,11 @@ class Search {
     const cacheKey = this.getCacheKey(query, page);
     const { results, meta, timestamp } = this.cache[cacheKey] || {};
     if (results && !this.getIsCacheExpired(timestamp)) {
-      return { results, meta };
+      const newResults = results.map((item) => ({
+        ...item,
+        isNew: false,
+      }));
+      return { results: newResults, meta };
     }
     return null;
   }
@@ -246,12 +247,19 @@ class Search {
         await Promise.all(imagePromises);
 
         html = data.html;
-        results = data.data.results;
+        results = data.data.results.map((item) => {
+          const existingId = this.findExistingCacheId(item.id);
+          if (existingId) {
+            return { ...item, cacheId: existingId, isNew: false };
+          } else {
+            return { ...item, cacheId: this.nextId++, isNew: true };
+          }
+        });
 
         if (query) {
           const cacheKey = this.getCacheKey(query, page);
           this.cache[cacheKey] = {
-            results: data.data.results,
+            results: results,
             meta: data.data.meta,
             timestamp: Date.now(),
           };
@@ -275,11 +283,12 @@ class Search {
         if (statusElement) {
           if (!query) {
             statusElement.textContent = "DEMO";
-            statusElement.className = "font-mono text-base text-muted";
+            statusElement.className =
+              "font-mono text-base text-muted hidden md:block text-muted";
           } else {
             const status = this.setStatus(item);
             statusElement.textContent = status.status;
-            statusElement.className = `font-mono text-base ${status.color}`;
+            statusElement.className = `font-mono text-base hidden md:block ${status.color}`;
           }
         }
       });

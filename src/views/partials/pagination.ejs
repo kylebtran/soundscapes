@@ -1,16 +1,16 @@
-<div id="pagination" class="mt-4">
+<div id="pagination" class="mt-4 print:hidden">
   <div class="container-fluid">
     <div class="flex w-full gap-5 justify-end">
       <button
           class="pagination-btn <%= meta.page === 1 ? 'disabled' : '' %>"
           data-action="first"
           <%= meta.page === 1 ? 'disabled' : '' %>
-        >q</button>
+        >|&lt;</button>
         <button
           class="pagination-btn <%= meta.page === 1 ? 'disabled' : '' %>"
           data-action="prev"
           <%= meta.page === 1 ? 'disabled' : '' %>
-        >w</button>
+        >&lt;</button>
         
         <% const startPage = Math.max(1, meta.page - 1) %>
         <% const endPage = Math.min(meta.totalPages, meta.page + 1) %>
@@ -45,12 +45,12 @@
           class="pagination-btn <%= meta.page === meta.totalPages ? 'disabled' : '' %>"
           data-action="next"
           <%= meta.page === meta.totalPages ? 'disabled' : '' %>
-        >o</button>
+        >&gt;</button>
         <button
           class="pagination-btn <%= meta.page === meta.totalPages ? 'disabled' : '' %>"
           data-action="last"
           <%= meta.page === meta.totalPages ? 'disabled' : '' %>
-        >p</button>
+        >&gt;|</button>
     </div>
   </div>
 </div>
