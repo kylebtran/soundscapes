@@ -138,3 +138,31 @@
     transform: translateY(-20px);
   }
 }
+
+@media print {
+  .hero-content h1,
+  .hero-content h2,
+  .feature-title,
+  .feature-card,
+  .background-wrapper {
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    scale: 1 !important;
+    translate: none !important;
+    y: 0 !important;
+    position: static !important;
+  }
+
+  [style*="visibility: hidden"],
+  [style*="opacity: 0"] {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .scroll-up,
+  .scroll-down {
+    transform: none !important;
+    transition: none !important;
+  }
+}
