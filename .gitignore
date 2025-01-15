@@ -4,3 +4,4 @@ coverage
 .DS_Store
 
 src/public/css/output.css
+.vercel
