@@ -59,3 +59,10 @@ To run Jest tests:
 ```bash
 npm test
 ```
+
+## Challenges and Solutions
+
+- **Framework**: Transitioning from React to EJS required reimplementing certain framework-level features manually. EJS layouts and partials were leveraged to maintain code separation and reusability familiar in modern frontend frameworks.
+- **Dynamic Search**: Initial client-side search result rendering using direct innerHTML injection promoted XSS vulnerabilities and poor modularity. This was resolved by implementing server-side rendering with EJS partials and Express, resulting in improved maintainability and usage of technology.
+- **Testing Infrastructure**: Implementing comprehensive Jest testing required establishing robust setup/teardown procedures as application complexity grew. Black-box testing methodology was set up for desired features.
+- **API Reliability**: Deezer API's availability during international travel over winter break necessitated implementing a local caching system with timestamp-based invalidation and extracted demo tracks for offline development
