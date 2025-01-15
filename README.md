@@ -4,7 +4,15 @@ Soundscapes is a music discovery platform that utilizes Deezer API to create suc
 
 ## Features
 
-- Browse and discover music available through Deezer
+- Dynamic searching for tracks, albums, and artists
+- XSS-sanitized search results with image placeholders
+- Continuous playback of track previews in succession
+- Local caching system for previously searched tracks
+- Hybrid server-client pagination controls
+- Multi-page track and album information display
+- Shareable search results via URL parameters
+- Responsive design for mobile and desktop devices
+- Print-friendly styling
 
 ## Prerequisites
 
