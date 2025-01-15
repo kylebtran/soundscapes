@@ -33,13 +33,18 @@ app.use("/about", aboutRouter);
 // Error handler
 app.use((err, req, res, next) => {
   const status = err.status || 500;
-  res.status(status).json({ error: err.message });
+  res.status(status).json({
+    success: false,
+    error: err.message,
+  });
 });
 
 // Server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}.`);
-});
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}.`);
+  });
+}
 
 module.exports = app;

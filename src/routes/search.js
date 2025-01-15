@@ -59,7 +59,7 @@ router.get("/", async (req, res) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "Failed to fetch and/or render results.",
     });
@@ -119,7 +119,7 @@ router.post("/render-partials", async (req, res) => {
     });
   } catch (error) {
     console.error("Template rendering error:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "Failed to render templates",
     });

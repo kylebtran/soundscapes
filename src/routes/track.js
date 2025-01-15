@@ -13,14 +13,24 @@ router.get("/:id", async (req, res) => {
       `https://api.deezer.com/album/${trackResponse.data.album.id}`
     );
 
-    return res.render("track", {
-      title: `${trackResponse.data.title} - Soundscapes`,
-      item: trackResponse.data,
-      album: albumResponse.data,
+    if (req.accepts("html")) {
+      return res.render("track", {
+        title: `${trackResponse.data.title} - Soundscapes`,
+        item: trackResponse.data,
+        album: albumResponse.data,
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        track: trackResponse.data,
+        album: albumResponse.data,
+      },
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "Failed to fetch track.",
     });

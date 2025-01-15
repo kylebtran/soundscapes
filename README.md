@@ -40,7 +40,9 @@ npm run build:css
 - **GSAP**
 - **axios**
 - **dotenv**
+
 - **nodemon**
+- **Jest**: JavaScript testing
 
 ## Development
 
@@ -48,4 +50,12 @@ To start development server:
 
 ```bash
 npm start
+```
+
+## Testing
+
+To run Jest tests:
+
+```bash
+npm test
 ```
